@@ -10,22 +10,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import java.util.regex.*;
 
 public class MainActivity extends Activity {
 	String Tag = "consol";
 	String save, flag;
 	double num1 = 0, num2 = 0;
-	String pattern = "\\d+";
+	FixCapacityStack<Double> vals;
+	FixCapacityStack<String> ops;
+	String pattern = "\\d+\\.*\\d*";
 	Pattern r = Pattern.compile(pattern);
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		Log.e(Tag, "Create");
-		EditText txt = (EditText) findViewById(R.id.editText1);
-		txt.setCursorVisible(false);
 	}
 
 	@Override
@@ -33,6 +36,8 @@ public class MainActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onStart();
 		Log.e(Tag, "Start");
+		vals = new FixCapacityStack<Double>();
+		ops = new FixCapacityStack<String>();
 	}
 
 	@Override
@@ -47,7 +52,7 @@ public class MainActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onResume();
 		if (save != null && !save.equals("")) {
-			EditText input = (EditText) findViewById(R.id.editText1);
+			TextView input = (TextView) findViewById(R.id.TextView);
 			input.setText(save);
 			save = null;	//free memory
 		}
@@ -58,7 +63,7 @@ public class MainActivity extends Activity {
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-		EditText input = (EditText) findViewById(R.id.editText1);
+		TextView input = (TextView) findViewById(R.id.TextView);
 		if (!input.getText().equals("")) {
 			save = input.getText().toString();
 		}
@@ -143,29 +148,35 @@ public class MainActivity extends Activity {
 		case R.id.ButtonBack:
 			if(save == null || save.equals(""))
 				break;
-			save = save.substring(0, save.length()-1);
+			save = save.substring(0, save.length()-1);//待支持stack back
 			break;
 			//TODO: confirm
 		// case R.id.ButtonBrackets :
 		// break;
 		case R.id.ButtonC:
 			save = null;
+			vals = new FixCapacityStack<Double>();
+			ops = new FixCapacityStack<String>();
 			break;
 		case R.id.ButtonAdd:
 			flag = "add";
 			save += "+";
+			ops.push("+");
 			break;
 		case R.id.ButtonDevide:
 			flag = "devide";
 			save += "/";
+			ops.push("/");
 			break;
 		case R.id.ButtonMinus:
 			flag = "minus";
 			save += "-";
+			ops.push("-");
 			break;
 		case R.id.ButtonMultiply:
 			flag = "multiply";
 			save += "*";
+			ops.push("*");
 			break;
 		case R.id.buttonEquals:
 			if(save.indexOf("=") >= 0)
@@ -201,12 +212,12 @@ public class MainActivity extends Activity {
 			}
 			break;
 		case R.id.ButtonPoint:
-			save += ".";
+			save += ".";//小数不支持正则
 			break;
 		case R.id.ButtonChange:
 			break;
 		}
-		EditText txt = (EditText) findViewById(R.id.editText1);
+		TextView txt = (TextView) findViewById(R.id.TextView);
 		if(save == null){
 			txt.setText("");
 		}else{

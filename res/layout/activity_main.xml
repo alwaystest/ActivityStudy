@@ -9,17 +9,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.activitystudy.MainActivity" >
 
-    <EditText
-        android:id="@+id/editText1"
+    <TextView
+        android:id="@+id/TextView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/OpenActivity2button"
+        android:layout_height="60dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="15dp"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
+         />
 
     <Button
         android:id="@+id/OpenActivity2button"
@@ -33,9 +28,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText1"
-        android:layout_below="@+id/editText1"
         android:orientation="vertical"
+        android:paddingTop="60dp"
         android:weightSum="5" >
 
         <LinearLayout
