@@ -22,7 +22,6 @@ public class MainActivity extends Activity {
 	FixCapacityStack<String> ops;
 	String pattern = "\\d+\\.*\\d*";
 	Pattern r = Pattern.compile(pattern);
-	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,7 @@ public class MainActivity extends Activity {
 		if (save != null && !save.equals("")) {
 			TextView input = (TextView) findViewById(R.id.TextView);
 			input.setText(save);
-			save = null;	//free memory
+			save = null; // free memory
 		}
 		Log.e(Tag, "Resume");
 	}
@@ -113,10 +112,15 @@ public class MainActivity extends Activity {
 		if (save == null) {
 			save = "";
 		}
-		if(save.indexOf("=") >= 0 && v.getId() != R.id.buttonEquals){
+		if (save.indexOf("=") >= 0 && v.getId() != R.id.buttonEquals) {
 			save = "";
+			vals = new FixCapacityStack<Double>();
+			ops = new FixCapacityStack<String>();
 		}
 		switch (v.getId()) {
+		case R.id.Button0:
+			save += "0";
+			break;
 		case R.id.Button1:
 			save += "1";
 			break;
@@ -146,11 +150,11 @@ public class MainActivity extends Activity {
 			break;
 
 		case R.id.ButtonBack:
-			if(save == null || save.equals(""))
+			if (save == null || save.equals(""))
 				break;
-			save = save.substring(0, save.length()-1);//待支持stack back
+			save = save.substring(0, save.length() - 1);// 待支持stack back
 			break;
-			//TODO: confirm
+		// TODO: confirm
 		// case R.id.ButtonBrackets :
 		// break;
 		case R.id.ButtonC:
@@ -159,69 +163,58 @@ public class MainActivity extends Activity {
 			ops = new FixCapacityStack<String>();
 			break;
 		case R.id.ButtonAdd:
-			flag = "add";
 			save += "+";
 			ops.push("+");
 			break;
 		case R.id.ButtonDevide:
-			flag = "devide";
 			save += "/";
 			ops.push("/");
 			break;
 		case R.id.ButtonMinus:
-			flag = "minus";
 			save += "-";
 			ops.push("-");
 			break;
 		case R.id.ButtonMultiply:
-			flag = "multiply";
 			save += "*";
 			ops.push("*");
 			break;
 		case R.id.buttonEquals:
-			if(save.indexOf("=") >= 0)
+			if (save.indexOf("=") >= 0)
 				break;
 			save += "=";
-			Matcher m = r.matcher(save);
-			if(m.find())
-				num1 = Double.parseDouble(m.group());
-			if(m.find())
-				num2 = Double.parseDouble(m.group());
-			if (flag == null || flag.equals("")) {
+			if (ops.isEmpty()) {
 				save += save.substring(0, save.length());
-				System.out.println(save);
-			}else if (flag.equals("add")) {
-//				while(m.find()){
-//					System.out.println(m.groupCount());
-//					System.out.println(m.group());
-//					System.out.println(m.group(1));
-//					num1 = Double.parseDouble(m.group(0));
-//					num2 = Double.parseDouble(m.group(1));
-//				}
-				save += Calculate.add(num1, num2);
-				flag = null;
-			} else if (flag.equals("minus")) {
-				save += Calculate.minus(num1, num2);
-				flag = null;
-			} else if (flag.equals("multiply")) {
-				save += Calculate.multiply(num1, num2);
-				flag = null;
-			} else if (flag.equals("devide")) {
-				save += Calculate.devide(num1, num2);
-				flag = null;
+				break;
 			}
+			Matcher m = r.matcher(save);
+			while (m.find()) {
+				vals.push(Double.parseDouble(m.group()));
+			}
+			while (!ops.isEmpty()) {
+				String op = ops.pop();
+				if (op.equals("+")) {
+					vals.push(Calculate.add(vals.pop(), vals.pop()));
+				} else if (op.equals("-")) {
+					vals.push(Calculate.minus(vals.pop(), vals.pop()));
+				} else if (op.equals("*")) {
+					vals.push(Calculate.multiply(vals.pop(), vals.pop()));
+				} else if (op.equals("/")) {
+					vals.push(Calculate.devide(vals.pop(), vals.pop()));
+				}
+			}
+			save += vals.pop().toString();
 			break;
 		case R.id.ButtonPoint:
-			save += ".";//小数不支持正则
+			save += ".";// 小数不支持正则
 			break;
 		case R.id.ButtonChange:
 			break;
 		}
 		TextView txt = (TextView) findViewById(R.id.TextView);
-		if(save == null){
+		if (save == null) {
 			txt.setText("");
-		}else{
-		txt.setText(save);
+		} else {
+			txt.setText(save);
 		}
 	}
 }

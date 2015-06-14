@@ -5,14 +5,14 @@ import java.util.Objects;
 public class FixCapacityStack<Item> {
 	private Item[] a;
 	private int N;
-	public void FixCapacityStack(){
+	public FixCapacityStack(){
 		a = (Item[]) new Object[2];
-		N = 2;
+		N = 0;
 	}
 	
 	public void resize(int max){
 		Item[] tmp = (Item[]) new Object[max];
-		for(int i = 0; i < a.length; i++){
+		for(int i = 0; i < N; i++){
 			tmp[i] = a[i];
 		}
 		a = tmp;
@@ -20,6 +20,10 @@ public class FixCapacityStack<Item> {
 	
 	public int size(){
 		return N;
+	}
+	
+	public boolean isEmpty(){
+		return N == 0;
 	}
 	
 	public void push(Item item){
@@ -36,5 +40,9 @@ public class FixCapacityStack<Item> {
 		Item tmp = a[--N];
 		a[N] = null;
 		return tmp;
+	}
+	public static void main(String[] args){
+		FixCapacityStack<String> fx = new FixCapacityStack<String>();
+		fx.push("hello");
 	}
 }
