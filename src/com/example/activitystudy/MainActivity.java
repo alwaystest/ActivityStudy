@@ -16,13 +16,13 @@ import java.util.regex.*;
 
 public class MainActivity extends Activity {
 	String Tag = "consol";
-	String save, flag;
+	String save, numsave, flag;
 	double num1 = 0, num2 = 0;
 	FixCapacityStack<Double> vals;
 	FixCapacityStack<String> ops;
 	String pattern = "\\d+\\.*\\d*";
 	Pattern r = Pattern.compile(pattern);
-	
+	Matcher m;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
 		if (save != null && !save.equals("")) {
 			TextView input = (TextView) findViewById(R.id.TextView);
 			input.setText(save);
-			save = null;	//free memory
+			save = null; // free memory
 		}
 		Log.e(Tag, "Resume");
 	}
@@ -110,58 +110,65 @@ public class MainActivity extends Activity {
 	}
 
 	public void clickButton(View v) {
-		if (save == null) {
+		if (save == null || numsave == null) {
 			save = "";
-		}
-		if(save.indexOf("=") >= 0 && v.getId() != R.id.buttonEquals){
+			numsave = "";
+		} else if (save.indexOf("=") >= 0 && v.getId() != R.id.buttonEquals) {
 			save = "";
+			numsave = "";
 		}
+
 		switch (v.getId()) {
 		case R.id.Button1:
-			save += "1";
+			numsave += "1";
 			break;
 		case R.id.Button2:
-			save += "2";
+			numsave += "2";
 			break;
 		case R.id.Button3:
-			save += "3";
+			numsave += "3";
 			break;
 		case R.id.Button4:
-			save += "4";
+			numsave += "4";
 			break;
 		case R.id.Button5:
-			save += "5";
+			numsave += "5";
 			break;
 		case R.id.Button6:
-			save += "6";
+			numsave += "6";
 			break;
 		case R.id.Button7:
-			save += "7";
+			numsave += "7";
 			break;
 		case R.id.Button8:
-			save += "8";
+			numsave += "8";
 			break;
 		case R.id.Button9:
-			save += "9";
+			numsave += "9";
 			break;
 
 		case R.id.ButtonBack:
-			if(save == null || save.equals(""))
+			if (numsave == null || (numsave.equals("") && save.equals("")))
 				break;
-			save = save.substring(0, save.length()-1);//待支持stack back
+			if(numsave.equals(""))
+				save = save.substring(0, save.length() - 1);
+			else
+				numsave = numsave.substring(0, save.length() - 1);// 待支持stack back
 			break;
-			//TODO: confirm
+		// TODO: confirm
 		// case R.id.ButtonBrackets :
 		// break;
 		case R.id.ButtonC:
 			save = null;
+			numsave = null;
 			vals = new FixCapacityStack<Double>();
 			ops = new FixCapacityStack<String>();
 			break;
 		case R.id.ButtonAdd:
 			flag = "add";
-			save += "+";
+			save += numsave + "+";
 			ops.push("+");
+			vals.push(Double.parseDouble(numsave));
 			break;
 		case R.id.ButtonDevide:
 			flag = "devide";
@@ -179,25 +186,20 @@ public class MainActivity extends Activity {
 			ops.push("*");
 			break;
 		case R.id.buttonEquals:
-			if(save.indexOf("=") >= 0)
+			if (save.indexOf("=") >= 0)
 				break;
 			save += "=";
-			Matcher m = r.matcher(save);
-			if(m.find())
-				num1 = Double.parseDouble(m.group());
-			if(m.find())
-				num2 = Double.parseDouble(m.group());
 			if (flag == null || flag.equals("")) {
 				save += save.substring(0, save.length());
 				System.out.println(save);
-			}else if (flag.equals("add")) {
-//				while(m.find()){
-//					System.out.println(m.groupCount());
-//					System.out.println(m.group());
-//					System.out.println(m.group(1));
-//					num1 = Double.parseDouble(m.group(0));
-//					num2 = Double.parseDouble(m.group(1));
-//				}
+			} else if (flag.equals("add")) {
+				// while(m.find()){
+				// System.out.println(m.groupCount());
+				// System.out.println(m.group());
+				// System.out.println(m.group(1));
+				// num1 = Double.parseDouble(m.group(0));
+				// num2 = Double.parseDouble(m.group(1));
+				// }
 				save += Calculate.add(num1, num2);
 				flag = null;
 			} else if (flag.equals("minus")) {
@@ -212,16 +214,23 @@ public class MainActivity extends Activity {
 			}
 			break;
 		case R.id.ButtonPoint:
-			save += ".";//小数不支持正则
+			save += ".";// 小数不支持正则，调试中
 			break;
 		case R.id.ButtonChange:
 			break;
 		}
 		TextView txt = (TextView) findViewById(R.id.TextView);
-		if(save == null){
+		if (save == null) {
 			txt.setText("");
-		}else{
-		txt.setText(save);
+		} else {
+			txt.setText(save + numsave);
 		}
+	}
+
+	private void regfind(Matcher m) {
+		if (m.find()) {
+			vals.push(Double.parseDouble(m.group()));
+		} else
+			Log.e(Tag, "Nothing found");
 	}
 }
