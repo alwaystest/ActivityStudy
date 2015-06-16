@@ -16,8 +16,10 @@ public class MainActivity extends Activity {
 	String Tag = "consol";
 	String save, flag;
 	double num1 = 0, num2 = 0;
-	String pattern = "\\d+";
-	Pattern r = Pattern.compile(pattern);
+	String pattern1 = "\\d+\\.?\\d*[*/]\\d+\\.?\\d*";
+	String pattern2 = "\\d+\\.?\\d*[+-]\\d+\\.?\\d*";
+	Pattern p1 = Pattern.compile(pattern1);
+	Pattern p2 = Pattern.compile(pattern2);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +114,9 @@ public class MainActivity extends Activity {
 			save = "";
 		}
 		switch (v.getId()) {
+		case R.id.Button0:
+			save += "0";
+			break;
 		case R.id.Button1:
 			save += "1";
 			break;
@@ -152,53 +157,52 @@ public class MainActivity extends Activity {
 			save = null;
 			break;
 		case R.id.ButtonAdd:
-			flag = "add";
 			save += "+";
 			break;
 		case R.id.ButtonDevide:
-			flag = "devide";
 			save += "/";
 			break;
 		case R.id.ButtonMinus:
-			flag = "minus";
 			save += "-";
 			break;
 		case R.id.ButtonMultiply:
-			flag = "multiply";
 			save += "*";
 			break;
 		case R.id.buttonEquals:
 			if(save.indexOf("=") >= 0)
 				break;
-			save += "=";
-			Matcher m = r.matcher(save);
-			if(m.find())
-				num1 = Double.parseDouble(m.group());
-			if(m.find())
-				num2 = Double.parseDouble(m.group());
-			if (flag == null || flag.equals("")) {
-				save += save.substring(0, save.length());
-				System.out.println(save);
-			}else if (flag.equals("add")) {
-//				while(m.find()){
-//					System.out.println(m.groupCount());
-//					System.out.println(m.group());
-//					System.out.println(m.group(1));
-//					num1 = Double.parseDouble(m.group(0));
-//					num2 = Double.parseDouble(m.group(1));
-//				}
-				save += Calculate.add(num1, num2);
-				flag = null;
-			} else if (flag.equals("minus")) {
-				save += Calculate.minus(num1, num2);
-				flag = null;
-			} else if (flag.equals("multiply")) {
-				save += Calculate.multiply(num1, num2);
-				flag = null;
-			} else if (flag.equals("devide")) {
-				save += Calculate.devide(num1, num2);
-				flag = null;
+			String result = new String(save);
+			Matcher m = p1.matcher(result);
+			while(m.find()){
+				String tmp = m.group();
+				if(tmp.indexOf("/") != -1){
+					String[] num = tmp.split("/");
+					Double tmpresult = Calculate.devide(Double.parseDouble(num[0]),Double.parseDouble(num[1]));
+					result = result.replaceFirst(tmp, tmpresult.toString());
+				}
+				else{
+					String[] num = tmp.split("\\*");
+					Double tmpresult = Calculate.multiply(Double.parseDouble(num[0]),Double.parseDouble(num[1]));
+					result = result.replaceFirst(Pattern.quote(tmp), tmpresult.toString());
+				}
+				m = p1.matcher(result);
 			}
+			m = p2.matcher(result);
+			while(m.find()){
+				String tmp = m.group();
+				if(tmp.indexOf("+") != -1){
+					String[] num = tmp.split("\\+");
+					Double tmpresult = Calculate.add(Double.parseDouble(num[0]),Double.parseDouble(num[1]));
+					result = result.replaceFirst(Pattern.quote(tmp), tmpresult.toString());
+				}
+				else{
+					String[] num = tmp.split("-");
+					Double tmpresult = Calculate.minus(Double.parseDouble(num[0]),Double.parseDouble(num[1]));
+					result = result.replaceFirst(tmp, tmpresult.toString());
+				}
+				m = p2.matcher(result);
+			}
+			save +="=" + result;
 			break;
 		case R.id.ButtonPoint:
 			save += ".";
